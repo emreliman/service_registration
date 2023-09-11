@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Islemler</title>
+    <!-- Add Bootstrap stylesheet -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="renderer.js"></script>
+  </head>
+  <body>
+    <div class="container mt-3">
+      <div class="row">
+        <div class="col-md-6">
+          <h1>Islemler</h1>
+        </div>
+        <div class="col-md-6">
+          <button type="button" class="btn btn-primary pull-right" onclick="displayRecords()">Refresh</button>
+          <button type="button" class="btn btn-secondary pull-right mr-3" onclick="backButton()">Geri</button>
+        </div>
+      </div>
+      <div class="row mt-3">
+        <div class="col-md-6">
+          <input type="text" class="form-control" id="filterInput" placeholder="Filtrele" oninput="filterRecords()">
+        </div>
+      </div>
+      <!-- Düzenleme Formu -->
+<div id="editForm" style="display: none;">
+  <h2>Düzenleme Formu</h2>
+  <form>
+    <div class="form-group">
+      <label for="editMake">Araç Yapımı:</label>
+      <input type="text" class="form-control" id="editMake" name="editMake">
+    </div>
+    <div class="form-group">
+      <label for="editOperation">İşlem:</label>
+      <input type="text" class="form-control" id="editOperation" name="editOperation">
+    </div>
+    <div class="form-group">
+      <label for="editOilChangeDate">Yağ Değiştirme Tarihi:</label>
+      <input type="date" class="form-control" id="editOilChangeDate" name="editOilChangeDate">
+    </div>
+    <button type="button" class="btn btn-primary" id="editSaveButton">Kaydet</button>
+    <button type="button" class="btn btn-secondary" id="editCancelButton" onclick="cancelEdit()">İptal</button>
+  </form>
+</div>
+      <table class="table mt-3">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Date</th>
+          </tr>
+        </thead>
+        <tbody id="records-tbody">
+          <!-- Your JavaScript code will populate this table with data from the database -->
+        </tbody>
+      </table>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Vehicle Maintenance Form App</title>
+    <!-- Add Bootstrap stylesheet -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="renderer.js"></script>
+  </head>
+  <body>
+    <div class="container mt-3">
+      <form>
+        <div class="form-group">
+          <label for="customer">Musteri</label>
+          <input type="text" class="form-control" id="customer" name="customer">
+        </div>
+        <div class="form-group">
+          <label for="vehicleMake">Araç Plaka</label>
+          <input type="text" class="form-control" id="vehiclePlate" name="vehicleMake">
+        </div>
+        <div class="form-group">
+          <label for="vehicleModel">Araç Model</label>
+          <input type="text" class="form-control" id="vehicleModel" name="vehicleModel">
+        </div>
+        <div class="form-group">
+          <label for="vehicleYear">Telefon</label>
+          <input type="number" class="form-control" id="vehicleContact" name="vehicleYear">
+        </div>
+        <div class="form-group">
+          <label for="oilChangeDate">Tarih</label>
+          <input type="date" class="form-control" id="ChangeDate" name="oilChangeDate">
+        </div>
+        <!-- <div class="form-group">
+          <label for="oilChangeMileage">Last Oil Change Mileage:</label>
+          <input type="number" class="form-control" id="oilChangeMileage" name="oilChangeMileage">
+        </div> -->
+        <!-- <div class="form-group">
+          <label for="vehicleOperation">Vehicle Operation:</label>
+          <select class="form-control" id="vehicleOperation" name="vehicleOperation">
+            <option value="Oil Change">Oil Change</option>
+            <option value="Tire Rotation">Tire Rotation</option>
+            <option value="Brake Service">Brake Service</option>
+            <option value="Transmission Service">Transmission Service</option>
+          </select>
+        </div> -->
+        <div class="summary">
+          <h4 class="text-danger">KDV Dahil Toplam Tutar: <span id="totalCost">0</span></h4>
+          <h4 class="text-danger">KDV Hariç Toplam Tutar: <span id="totalCostWithoutKDV">0</span></h4>
+          <h4  class="text-primary">Toplam İşçilik Tutarı: <span id="totalLaborCost">0</span></h4>
+          <h4  class="text-success">Toplam Yedek Parça Tutarı: <span id="totalEquipmentCost">0</span></h4>
+        </div>
+        <div class="excel-like">
+          <table>
+            <thead>
+              <tr>
+                <th>Yedek Parça</th>
+                <th>Tutar</th>
+                <th>İşçilik İsmi</th>
+                <th>İşçilik Tutarı</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="text" placeholder="Yedek Parça"></td>
+                <td><input type="number" placeholder="Tutar" oninput="calculateTotals()" onfocus="calculateTotals()"></td>
+                <td><input type="text" placeholder="İşçilik İsmi"></td>
+                <td><input type="number" placeholder="İşçilik Tutarı" oninput="calculateTotals()" onfocus="calculateTotals()"></td>
+                <td><button onclick="deleteRow(this)">Sil</button></td>
+              </tr>
+              <!-- Diğer satırlar buraya eklenebilir -->
+            </tbody>
+          </table>
+          <button class="add-row" onclick="addRow(); return false;">Yeni Alan Ekle</button>
+        </div>
+
+        <button type="button" class="btn btn-primary mt-3" onclick="saveFormData()">Kaydet</button>
+      </form>
+      
+    </div>
+ 
+  </body>
+</html>
