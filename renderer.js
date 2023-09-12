@@ -1,78 +1,69 @@
 document.addEventListener("DOMContentLoaded", calculateTotals);
 
-// get oilchangedate and set to today
-// var today = new Date();
-// var dd = today.getDate();
-// var mm = today.getMonth()+1; //January is 0 so need to add 1 to make it 1!
-// var yyyy = today.getFullYear();
-
-// document.getElementById("oilChangeDate").value = yyyy + "-" + mm + "-" + dd;
-
-/*
-async function saveFormData() {
-    const vehiclePlate = document.getElementById('vehiclePlate').value
-    const vehicleModel = document.getElementById('vehicleModel').value
-    const vehicleYear = document.getElementById('vehicleYear').value
-    const oilChangeDate = document.getElementById('oilChangeDate').value
-    const oilChangeMileage = document.getElementById('oilChangeMileage').value
-    const vehicleOperation = document.getElementById('vehicleOperation').value
-
-    sqlite3.connection(vehiclePlate, vehicleModel, vehicleYear, oilChangeDate, oilChangeMileage, vehicleOperation)
-}
-*/
-
 function saveFormData() {
   const customer = document.getElementById("customer").value;
   const vehiclePlate = document.getElementById("vehiclePlate").value;
   const vehicleModel = document.getElementById("vehicleModel").value;
   const vehicleContact = document.getElementById("vehicleContact").value;
-  const ChangeDate = document.getElementById("ChangeDate").value;
+  const vehicleKm = document.getElementById("vehicleKm").value;
+  const changeDate = document.getElementById("changeDate").value;
 
   const tableBody = document.querySelector(".excel-like table tbody");
   const rows = tableBody.querySelectorAll("tr");
 
   const records = [];
+  // if customer, vehiclePlate, vehicleContact, vehicleKm, changeDate is empty, return alert
+  if (
+    customer === "" ||
+    vehiclePlate === "" ||
+    vehicleContact === "" ||
+    vehicleKm === ""
+  ) {
+    alert("Lütfen boş alan bırakmayınız.");
+    return;
+  }
 
   rows.forEach((row) => {
+    const ref = row.querySelector("td:nth-child(1) input[type='text']").value;
     const equipment = row.querySelector(
-      "td:nth-child(1) input[type='text']"
+      "td:nth-child(2) input[type='text']"
     ).value;
     const equipmentCost =
       parseFloat(
-        row.querySelector("td:nth-child(2) input[type='number']").value
+        row.querySelector("td:nth-child(3) input[type='number']").value
       ) || 0;
-    const labor = row.querySelector("td:nth-child(3) input[type='text']").value;
+    const labor = row.querySelector("td:nth-child(4) input[type='text']").value;
     const laborCost =
       parseFloat(
-        row.querySelector("td:nth-child(4) input[type='number']").value
+        row.querySelector("td:nth-child(5) input[type='number']").value
       ) || 0;
 
     records.push({
+      ref,
       equipment,
       equipmentCost,
       labor,
       laborCost,
     });
   });
-  recordsJSON = JSON.stringify(records);
+  const operation = JSON.stringify(records);
+  console.log(operation, records);
   sqlite3.connection(
     customer,
     vehiclePlate,
     vehicleModel,
+    vehicleKm,
     vehicleContact,
-    ChangeDate,
-    recordsJSON
+    changeDate,
+    operation
   );
 
   //ipcRenderer.send("save-form-data", data);
 }
 
-// async function calldisplayRecords(){
-//   window.onload = async function() {
-//     await displayRecords();
-//     console.log("hella");
-//   }
-// }
+function openRecords() {
+  ipcRenderer.send("open-records");
+}
 
 async function displayRecords() {
   const rows = await ipcRenderer.invoke("db-query", "SELECT * FROM vehicles");
@@ -90,6 +81,8 @@ async function displayRecords() {
       <td>${row.customer}</td>
       <td>${row.vehiclePlate}</td>
       <td>${row.vehicleModel}</td>
+      <td>${row.vehicleKm}</td>
+      <td>${row.changeDate}</td>
       <td>
         <button class="btn btn-primary" onclick="editRecord(${row.id})">Düzenle</button>
         <button class="btn btn-danger" onclick="deleteRecord(${row.id})">Sil</button>
@@ -99,34 +92,13 @@ async function displayRecords() {
   });
 }
 
-ipcRenderer.on("asynchronous-message", function (evt, message) {
+ipcRenderer.on("display-records", function (evt, message) {
   displayRecords(); // Returns: {'SAVED': 'File Saved'}
-  console.log("sa");
+  console.log("display Records");
 });
 function backButton() {
   ipcRenderer.send("back-to-index");
 }
-
-// function addTaskField() {
-//   // Get the parent div of the input group
-//   var parentDiv = document.querySelector('.panel-body');
-
-//   // Create a new input group
-//   var newInputGroup = document.createElement('div');
-//   newInputGroup.className = 'm-5';
-
-//   // Create a new input field
-//   var newInput = document.createElement('input');
-//   newInput.type = 'text';
-//   newInput.className = 'form-control';
-//   newInput.placeholder = 'Yapılan işlem';
-
-//   // Append the input field to the new input group
-//   newInputGroup.appendChild(newInput);
-
-//   // Append the new input group to the parent div
-//   parentDiv.appendChild(newInputGroup);
-// }
 
 function filterRecords() {
   const filterText = document
@@ -169,47 +141,148 @@ async function editRecord(recordId) {
     .invoke("db-query", `SELECT * FROM vehicles WHERE id = ${recordId}`)
     .then((rows) => rows[0]);
 
-  console.log(record);
-
+  // console.log(record);
+  // console.log(JSON.parse(record.operation))
+  const operations = JSON.parse(record.operation);
+  const tableBody = document.querySelector("#records-excel table tbody");
   const editForm = document.getElementById("editForm");
   editForm.style.display = "block";
 
-  document.getElementById("editMake").value = record.customer;
-  document.getElementById("editOperation").value = record.vehiclePlate;
-  document.getElementById("editOilChangeDate").value = record.vehicleModel;
+  const customer = document.querySelector('#editForm input[name="customer"]');
+  const vehiclePlate = document.querySelector(
+    '#editForm input[name="vehiclePlate"]'
+  );
+  const changeDate = document.querySelector(
+    '#editForm input[name="changeDate"]'
+  );
+  const vehicleModel = document.querySelector(
+    '#editForm input[name="vehicleModel"]'
+  );
+  const vehicleKm = document.querySelector('#editForm input[name="vehicleKm"]');
+  const vehicleContact = document.querySelector(
+    '#editForm input[name="vehicleContact"]'
+  );
+  for (const i of operations) {
+    const newRow = document.createElement("tr");
+    newRow.innerHTML = `
+    <td><input type="text" placeholder="Referans No" value="${i.ref}"></td>
+    <td><input type="text" placeholder="Yedek Parça" value="${i.equipment}"></td>
+    <td><input type="number" placeholder="Tutar" oninput="calculateTotals()" onfocus="calculateTotals()" value="${i.equipmentCost}"></td>
+    <td><input type="text" placeholder="İşçilik İsmi" value="${i.labor}"></td>
+    <td><input type="number" placeholder="İşçilik Tutarı" oninput="calculateTotals()" onfocus="calculateTotals()" value="${i.laborCost}"></td>
+    <td><button class="btn btn-danger" onclick="deleteRow(this); calculateTotals();">Sil</button></td>
+  `;
+    tableBody.appendChild(newRow);
+  }
+
+  customer.value = record.customer;
+  vehiclePlate.value = record.vehiclePlate;
+  changeDate.value = record.changeDate;
+  vehicleModel.value = record.vehicleModel;
+  vehicleKm.value = record.vehicleKm;
+  vehicleContact.value = record.vehicleContact;
 
   document.getElementById("editSaveButton").onclick = () => {
-    const updatedMake = document.getElementById("editMake").value;
-    const updatedOperation = document.getElementById("editOperation").value;
-    const updatedOilChangeDate =
-      document.getElementById("editOilChangeDate").value;
+    const isConfirmed = confirm(
+      "Bu işlemi kaydetmek istediğinizden emin misiniz?"
+    );
+    if (!isConfirmed) {
+      return;
+    }
+    const customer = document.querySelector(
+      '#editForm input[name="customer"]'
+    ).value;
+    const vehiclePlate = document.querySelector(
+      '#editForm input[name="vehiclePlate"]'
+    ).value;
+    const changeDate = document.querySelector(
+      '#editForm input[name="changeDate"]'
+    ).value;
+    const vehicleModel = document.querySelector(
+      '#editForm input[name="vehicleModel"]'
+    ).value;
+    const vehicleKm = document.querySelector(
+      '#editForm input[name="vehicleKm"]'
+    ).value;
+    const vehicleContact = document.querySelector(
+      '#editForm input[name="vehicleContact"]'
+    ).value;
+    const rows = tableBody.querySelectorAll("tr");
+    const records = [];
+    rows.forEach((row) => {
+      const ref = row.querySelector(
+        "#editForm td:nth-child(1) input[type='text']"
+      ).value;
+      const equipment = row.querySelector(
+        "td:nth-child(2) input[type='text']"
+      ).value;
+      const equipmentCost =
+        parseFloat(
+          row.querySelector("#editForm td:nth-child(3) input[type='number']")
+            .value
+        ) || 0;
+      const labor = row.querySelector(
+        "#editForm td:nth-child(4) input[type='text']"
+      ).value;
+      const laborCost =
+        parseFloat(
+          row.querySelector("#editForm td:nth-child(5) input[type='number']")
+            .value
+        ) || 0;
+
+      records.push({
+        ref,
+        equipment,
+        equipmentCost,
+        labor,
+        laborCost,
+      });
+    });
+    const recordsJSON = JSON.stringify(records);
 
     ipcRenderer.invoke(
       "db-query",
-      `UPDATE vehicles SET make = '${updatedMake}', operation = '${updatedOperation}', oilChangeDate = '${updatedOilChangeDate}' WHERE id = ${recordId}`
+      `UPDATE vehicles SET customer = '${customer}', vehiclePlate = '${vehiclePlate}', changeDate = '${changeDate}', vehicleModel = '${vehicleModel}', vehicleKm = '${vehicleKm}', vehicleContact = '${vehicleContact}', operation = '${recordsJSON}' WHERE id = ${recordId}`
     );
+    editForm.style.display = "none";
+    // remove all rows from table
+    while (tableBody.firstChild) {
+      tableBody.removeChild(tableBody.firstChild);
+    }
   };
+  calculateTotals();
 }
 
 function cancelEdit() {
   const editForm = document.getElementById("editForm");
   editForm.style.display = "none";
+  // remove all rows from table
+  const tableBody = document.querySelector("#records-excel table tbody");
+  while (tableBody.firstChild) {
+    tableBody.removeChild(tableBody.firstChild);
+  }
 }
 
 function addRow() {
-  const tableBody = document.querySelector(".excel-like table tbody");
+  let tableBody = document.querySelector(".excel-like table tbody");
+  if (tableBody === null) {
+    tableBody = document.querySelector("#records-excel table tbody");
+  }
   const newRow = document.createElement("tr");
 
   newRow.innerHTML = `
+  <td><input type="text" placeholder="Referans No"></td>
   <td><input type="text" placeholder="Yedek Parça"></td>
   <td><input type="number" placeholder="Tutar" oninput="calculateTotals()" onfocus="calculateTotals()"></td>
   <td><input type="text" placeholder="İşçilik İsmi"></td>
   <td><input type="number" placeholder="İşçilik Tutarı" oninput="calculateTotals()" onfocus="calculateTotals()"></td>
-  <td><button onclick="deleteRow(this); calculateTotals();">Sil</button></td>
+  <td><button class="btn btn-danger" onclick="deleteRow(this); calculateTotals();">Sil</button></td>
 `;
 
-  const firstRow = tableBody.querySelector("tr");
-  tableBody.insertBefore(newRow, firstRow);
+  // const firstRow = tableBody.querySelector("tr");
+  tableBody.appendChild(newRow);
+
+  // tableBody.insertBefore(newRow, firstRow);
 }
 
 function deleteRow(button) {
@@ -226,15 +299,18 @@ function calculateTotals() {
   let totalLaborCost = 0;
   let totalEquipmentCost = 0;
 
-  const tableBody = document.querySelector(".excel-like table tbody");
+  let tableBody = document.querySelector(".excel-like table tbody");
+  if (tableBody === null) {
+    tableBody = document.querySelector("#records-excel table tbody");
+  }
   const rows = tableBody.querySelectorAll("tr");
 
   rows.forEach((row) => {
     const equipmentCostInput = row.querySelector(
-      "td:nth-child(2) input[type='number']"
+      "td:nth-child(3) input[type='number']"
     );
     const laborCostInput = row.querySelector(
-      "td:nth-child(4) input[type='number']"
+      "td:nth-child(5) input[type='number']"
     );
 
     const equipmentCost = parseFloat(equipmentCostInput.value) || 0;

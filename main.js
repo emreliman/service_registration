@@ -8,6 +8,7 @@ let db = new sqlite3.Database("./vehicle-maintenance.db", (err) => {
   }
   console.log("Connected to the vehicle maintenance database.");
 });
+
 // create table
 db.run(
   `CREATE TABLE IF NOT EXISTS vehicles (
@@ -15,6 +16,7 @@ db.run(
       customer TEXT NOT NULL,
       vehiclePlate TEXT NOT NULL,
       vehicleModel TEXT NOT NULL,
+      vehicleKm TEXT NOT NULL,
       vehicleContact TEXT NOT NULL,
       changeDate TEXT NOT NULL,
       operation TEXT NOT NULL
@@ -28,9 +30,14 @@ db.run(
 );
 
 ipcMain.handle("db-query", async (event, sqlQuery) => {
+  console.log(sqlQuery);
   return new Promise((res) => {
     db.all(sqlQuery, (err, rows) => {
       res(rows);
+
+      // if (err) {
+      //   console.error(err.message);
+      // }
     });
   });
 });
@@ -38,7 +45,7 @@ ipcMain.handle("db-query", async (event, sqlQuery) => {
 // db.close()
 
 let mainWindow;
-
+let win;
 function loadIndex() {
   win.loadFile("index.html");
 }
@@ -46,8 +53,8 @@ function loadIndex() {
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: 1000,
+    height: 1000,
     webPreferences: {
       nodeIntegration: true,
       contextIsolation: true,
@@ -62,7 +69,7 @@ function createWindow() {
   win.loadFile("index.html");
 
   win.webContents.on("dom-ready", function () {
-    win.webContents.send("asynchronous-message", { SAVED: "File Saved" });
+    win.webContents.send("display-records", { SAVED: "File Saved" });
   });
 
   ipcMain.on("open-records", () => {

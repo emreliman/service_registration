@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8">
     <title>Islemler</title>
     <!-- Add Bootstrap stylesheet -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./styles.css">
     <script src="renderer.js"></script>
   </head>
   <body>
@@ -13,43 +15,81 @@
         <div class="col-md-6">
           <h1>Islemler</h1>
         </div>
-        <div class="col-md-6">
-          <button type="button" class="btn btn-primary pull-right" onclick="displayRecords()">Refresh</button>
-          <button type="button" class="btn btn-secondary pull-right mr-3" onclick="backButton()">Geri</button>
+        <div class="col-md-6 d-flex justify-content-end">
+          <button type="button" class="btn btn-secondary ml-4  " onclick="backButton()">Geri</button>
         </div>
       </div>
       <div class="row mt-3">
         <div class="col-md-6">
-          <input type="text" class="form-control" id="filterInput" placeholder="Filtrele" oninput="filterRecords()">
+          <input type="text" class="form-control m-1" id="filterInput" placeholder="Filtrele" oninput="filterRecords()">
         </div>
       </div>
       <!-- Düzenleme Formu -->
-<div id="editForm" style="display: none;">
-  <h2>Düzenleme Formu</h2>
+<div id="editForm" style="display: none;" class="m-2 p-2">
+  <h3>Düzenleme Formu</h3>
   <form>
     <div class="form-group">
-      <label for="editMake">Araç Yapımı:</label>
-      <input type="text" class="form-control" id="editMake" name="editMake">
+      <label for="customer">Musteri</label>
+      <input type="text" class="form-control" id="customer" name="customer">
     </div>
     <div class="form-group">
-      <label for="editOperation">İşlem:</label>
-      <input type="text" class="form-control" id="editOperation" name="editOperation">
+      <label for="vehicleMake">Araç Plaka</label>
+      <input type="text" class="form-control" id="vehiclePlate" name="vehiclePlate">
     </div>
     <div class="form-group">
-      <label for="editOilChangeDate">Yağ Değiştirme Tarihi:</label>
-      <input type="date" class="form-control" id="editOilChangeDate" name="editOilChangeDate">
+      <label for="vehicleModel">Araç Model</label>
+      <input type="text" class="form-control" id="vehicleModel" name="vehicleModel">
     </div>
-    <button type="button" class="btn btn-primary" id="editSaveButton">Kaydet</button>
-    <button type="button" class="btn btn-secondary" id="editCancelButton" onclick="cancelEdit()">İptal</button>
+    <div class="form-group">
+      <label for="vehicleKm">Araç Kilometre</label>
+      <input type="number" class="form-control" id="vehicleKm" name="vehicleKm">
+    </div>
+    <div class="form-group">
+      <label for="vehicleYear">Telefon</label>
+      <input type="number" class="form-control" id="vehicleContact" name="vehicleContact">
+    </div>
+    <div class="form-group">
+      <label for="oilChangeDate">Tarih</label>
+      <input type="date" class="form-control" id="ChangeDate" name="changeDate">
+    </div>
   </form>
+  <div class="summary">
+    <h4 class="text-danger">KDV <b><u>Dahil</u></b> Toplam Tutar: <span id="totalCost">0</span>₺</h4>
+    <h4 class="text-danger">KDV <b><u>Hariç</u></b> Toplam Tutar: <span id="totalCostWithoutKDV">0</span>₺</h4>
+    <h4  class="text-primary">Toplam İşçilik Tutarı: <span id="totalLaborCost">0</span>₺</h4>
+    <h4  class="text-success">Toplam Yedek Parça Tutarı: <span id="totalEquipmentCost">0</span>₺</h4>
+  </div>
+  <div id="records-excel" class="border dashed m-2 p-2 ">
+    <table>
+      <thead>
+        <tr>
+          <th>Referans No:</th>
+          <th>Yedek Parça</th>
+          <th>Tutar</th>
+          <th>İşçilik İsmi</th>
+          <th>İşçilik Tutarı</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Diğer satırlar buraya eklenebilir -->
+      </tbody>
+    </table>
+    <button class="add-row" onclick="addRow(); return false;">Yeni Alan Ekle</button>
+
+  </div>
+  <button type="button" class="btn btn-primary" id="editSaveButton">Kaydet</button>
+    <button type="button" class="btn btn-secondary" id="editCancelButton" onclick="cancelEdit()">İptal</button>
 </div>
       <table class="table mt-3">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Date</th>
+            <th>Müşteri</th>
+            <th>Plaka</th>
+            <th>Model</th>
+            <th>Kilometre</th>
+            <th>Tarih</th>
           </tr>
         </thead>
         <tbody id="records-tbody">

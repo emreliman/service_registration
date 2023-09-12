@@ -8,6 +8,7 @@ function connection(
   customer,
   vehiclePlate,
   vehicleModel,
+  vehicleKm,
   vehicleContact,
   changeDate,
   operation
@@ -17,6 +18,7 @@ function connection(
       customer,
       vehiclePlate,
       vehicleModel,
+      vehicleKm,
       vehicleContact,
       changeDate,
       operation
@@ -25,11 +27,12 @@ function connection(
       console.error(err.message);
     }
     db.run(
-      `INSERT INTO vehicles(customer, vehiclePlate, vehicleModel, vehicleContact, changeDate, operation) VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO vehicles(customer, vehiclePlate, vehicleModel, vehicleKm, vehicleContact, changeDate, operation) VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         customer,
         vehiclePlate,
         vehicleModel,
+        vehicleKm,
         vehicleContact,
         changeDate,
         operation,
@@ -76,19 +79,21 @@ contextBridge.exposeInMainWorld("sqlite3", {
   Database: (str) => new sqlite3.Database(str),
   verbose: () => sqlite3.verbose(),
   connection: (
-    vehicleMake,
+    customer,
+    vehiclePlate,
     vehicleModel,
-    vehicleYear,
-    oilChangeDate,
-    oilChangeMileage,
-    vehicleOperation
+    vehicleKm,
+    vehicleContact,
+    changeDate,
+    operation
   ) =>
     connection(
-      vehicleMake,
+      customer,
+      vehiclePlate,
       vehicleModel,
-      vehicleYear,
-      oilChangeDate,
-      oilChangeMileage,
-      vehicleOperation
+      vehicleKm,
+      vehicleContact,
+      changeDate,
+      operation
     ),
 });

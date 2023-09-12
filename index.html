@@ -5,10 +5,17 @@
     <title>Vehicle Maintenance Form App</title>
     <!-- Add Bootstrap stylesheet -->
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
+    <!-- add Bootstrap from nodemodules-->
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
     <script src="renderer.js"></script>
   </head>
   <body>
+      <h3>
+        Servis Formu
+      </h3>
+      <!-- işlemler butonu  -->
+      <button type="button" class="btn btn-secondary ml-4  " onclick="openRecords()">İşlemler</button>
     <div class="container mt-3">
       <form>
         <div class="form-group">
@@ -24,12 +31,16 @@
           <input type="text" class="form-control" id="vehicleModel" name="vehicleModel">
         </div>
         <div class="form-group">
+          <label for="vehicleKm">Araç Kilometre</label>
+          <input type="number" class="form-control" id="vehicleKm" name="vehicleKm">
+        </div>
+        <div class="form-group">
           <label for="vehicleYear">Telefon</label>
           <input type="number" class="form-control" id="vehicleContact" name="vehicleYear">
         </div>
         <div class="form-group">
           <label for="oilChangeDate">Tarih</label>
-          <input type="date" class="form-control" id="ChangeDate" name="oilChangeDate">
+          <input type="date" class="form-control" id="changeDate" name="oilChangeDate">
         </div>
         <!-- <div class="form-group">
           <label for="oilChangeMileage">Last Oil Change Mileage:</label>
@@ -45,8 +56,8 @@
           </select>
         </div> -->
         <div class="summary">
-          <h4 class="text-danger">KDV Dahil Toplam Tutar: <span id="totalCost">0</span></h4>
-          <h4 class="text-danger">KDV Hariç Toplam Tutar: <span id="totalCostWithoutKDV">0</span></h4>
+          <h4 class="text-danger">KDV <b><u>Dahil</u></b> Toplam Tutar: <span id="totalCost">0</span></h4>
+          <h4 class="text-danger">KDV <b><u>Hariç</u></b> Toplam Tutar: <span id="totalCostWithoutKDV">0</span></h4>
           <h4  class="text-primary">Toplam İşçilik Tutarı: <span id="totalLaborCost">0</span></h4>
           <h4  class="text-success">Toplam Yedek Parça Tutarı: <span id="totalEquipmentCost">0</span></h4>
         </div>
@@ -54,6 +65,7 @@
           <table>
             <thead>
               <tr>
+                <th>Referans No:</th>
                 <th>Yedek Parça</th>
                 <th>Tutar</th>
                 <th>İşçilik İsmi</th>
@@ -63,11 +75,12 @@
             </thead>
             <tbody>
               <tr>
+                <td><input type="text" placeholder="Referans No"></td>
                 <td><input type="text" placeholder="Yedek Parça"></td>
                 <td><input type="number" placeholder="Tutar" oninput="calculateTotals()" onfocus="calculateTotals()"></td>
                 <td><input type="text" placeholder="İşçilik İsmi"></td>
                 <td><input type="number" placeholder="İşçilik Tutarı" oninput="calculateTotals()" onfocus="calculateTotals()"></td>
-                <td><button onclick="deleteRow(this)">Sil</button></td>
+                <td><button class="btn btn-danger" onclick="deleteRow(this)">Sil</button></td>
               </tr>
               <!-- Diğer satırlar buraya eklenebilir -->
             </tbody>
