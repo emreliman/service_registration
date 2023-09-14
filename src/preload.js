@@ -3,6 +3,7 @@ const path = require("path");
 const { contextBridge, ipcRenderer } = require("electron");
 const fs = require("fs");
 const sqlite3 = require("sqlite3");
+const Toastify = require('toastify-js');
 
 function connection(
   customer,
@@ -11,6 +12,7 @@ function connection(
   vehicleKm,
   vehicleContact,
   changeDate,
+  note,
   operation
 ) {
   let db = new sqlite3.Database("./vehicle-maintenance.db", (err) => {
@@ -21,13 +23,14 @@ function connection(
       vehicleKm,
       vehicleContact,
       changeDate,
+      note,
       operation
     );
     if (err) {
       console.error(err.message);
     }
     db.run(
-      `INSERT INTO vehicles(customer, vehiclePlate, vehicleModel, vehicleKm, vehicleContact, changeDate, operation) VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO vehicles(customer, vehiclePlate, vehicleModel, vehicleKm, vehicleContact, changeDate,note, operation) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         customer,
         vehiclePlate,
@@ -35,6 +38,7 @@ function connection(
         vehicleKm,
         vehicleContact,
         changeDate,
+        note,
         operation,
       ],
       function (err) {
@@ -74,6 +78,10 @@ contextBridge.exposeInMainWorld("fs", {
   isDirectory: (str) => fs.statSync(str).isDirectory(),
 });
 
+contextBridge.exposeInMainWorld('Toastify', {
+  toast: (options) => Toastify(options).showToast(),
+});
+
 // sqlite
 contextBridge.exposeInMainWorld("sqlite3", {
   Database: (str) => new sqlite3.Database(str),
@@ -85,6 +93,7 @@ contextBridge.exposeInMainWorld("sqlite3", {
     vehicleKm,
     vehicleContact,
     changeDate,
+    note,
     operation
   ) =>
     connection(
@@ -94,6 +103,7 @@ contextBridge.exposeInMainWorld("sqlite3", {
       vehicleKm,
       vehicleContact,
       changeDate,
+      note,
       operation
     ),
 });

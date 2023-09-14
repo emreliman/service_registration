@@ -5,7 +5,7 @@
     <title>Islemler</title>
     <!-- Add Bootstrap stylesheet -->
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
-    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="./styles.css">
     <script src="renderer.js"></script>
   </head>
@@ -53,6 +53,10 @@
       <input type="date" class="form-control" id="ChangeDate" name="changeDate">
     </div>
   </form>
+  <div class="form-floating mt-3 mb-3">
+    <textarea class="form-control" placeholder="Not yazın" id="floatingTextarea3" style="height: 100px"></textarea>
+    <label for="floatingTextarea3">Notlar</label>
+  </div>
   <div class="summary">
     <h4 class="text-danger">KDV <b><u>Dahil</u></b> Toplam Tutar: <span id="totalCost">0</span>₺</h4>
     <h4 class="text-danger">KDV <b><u>Hariç</u></b> Toplam Tutar: <span id="totalCostWithoutKDV">0</span>₺</h4>

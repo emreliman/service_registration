@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Chart</title>
+        <!-- add bootstrap from node modules -->
+        <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <!-- add chartjs from node modules -->
+        <script src="../node_modules/chart.js/dist/Chart.umd.js"></script>
+        
+        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script> -->
+    </head>
+    <body>
+        <div class="d-flex flex-column p-2 m-2 align-items-center justify-content-center">
+            <!-- Geri butonu -->
+            <button type="button" class="btn btn-secondary ml-4  " onclick="backButton()">Geri</button>
+            <h2>Aylık Kazançlar</h2>
+            <div>
+                <canvas class="m-auto" id="myChart" width="800" height="400"></canvas>
+            </div>
+        
+        <div class="container">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Ay</th>
+                        <th scope="col">Toplam</th>
+                        <th scope="col">işçilik</th>
+                        <th scope="col">Yedek Parça</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <!-- Veriler buraya eklenecek -->
+                </tbody>
+            </table>
+        </div>
+
+        
+        </div>
+        <script src="chart.js"></script>
+    </body>
+</html>

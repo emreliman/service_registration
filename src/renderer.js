@@ -1,16 +1,19 @@
 document.addEventListener("DOMContentLoaded", calculateTotals);
 
-function saveFormData() {
+function saveFormData(event) {
   const customer = document.getElementById("customer").value;
   const vehiclePlate = document.getElementById("vehiclePlate").value;
   const vehicleModel = document.getElementById("vehicleModel").value;
   const vehicleContact = document.getElementById("vehicleContact").value;
   const vehicleKm = document.getElementById("vehicleKm").value;
-  const changeDate = document.getElementById("changeDate").value;
+  const note = document.getElementById("floatingTextarea2").value;
+  let changeDate = document.getElementById("changeDate").value;
 
   const tableBody = document.querySelector(".excel-like table tbody");
   const rows = tableBody.querySelectorAll("tr");
-
+  if (changeDate === "") {
+    changeDate = new Date().toLocaleDateString();
+  }
   const records = [];
   // if customer, vehiclePlate, vehicleContact, vehicleKm, changeDate is empty, return alert
   if (
@@ -19,7 +22,7 @@ function saveFormData() {
     vehicleContact === "" ||
     vehicleKm === ""
   ) {
-    alert("Lütfen boş alan bırakmayınız.");
+    alertError("Lütfen boş alan bırakmayınız.");
     return;
   }
 
@@ -47,7 +50,6 @@ function saveFormData() {
     });
   });
   const operation = JSON.stringify(records);
-  console.log(operation, records);
   sqlite3.connection(
     customer,
     vehiclePlate,
@@ -55,12 +57,15 @@ function saveFormData() {
     vehicleKm,
     vehicleContact,
     changeDate,
+    note,
     operation
   );
 
   //ipcRenderer.send("save-form-data", data);
 }
-
+function openSummary() {
+  ipcRenderer.send("open-summary");
+}
 function openRecords() {
   ipcRenderer.send("open-records");
 }
@@ -93,8 +98,7 @@ async function displayRecords() {
 }
 
 ipcRenderer.on("display-records", function (evt, message) {
-  displayRecords(); // Returns: {'SAVED': 'File Saved'}
-  console.log("display Records");
+  displayRecords();
 });
 function backButton() {
   ipcRenderer.send("back-to-index");
@@ -109,14 +113,18 @@ function filterRecords() {
   const tableRows = document.querySelectorAll("tbody tr");
 
   tableRows.forEach((row) => {
-    const make = row.cells[1].textContent.toLowerCase();
-    const operation = row.cells[2].textContent.toLowerCase();
-    const oilChangeDate = row.cells[3].textContent.toLowerCase();
+    const customer = row.querySelector("td:nth-child(2)").textContent;
+    const vehiclePlate = row.querySelector("td:nth-child(3)").textContent;
+    const vehicleModel = row.querySelector("td:nth-child(4)").textContent;
+    const vehicleKm = row.querySelector("td:nth-child(5)").textContent;
+    const changeDate = row.querySelector("td:nth-child(6)").textContent;
 
     if (
-      make.includes(filterText) ||
-      operation.includes(filterText) ||
-      oilChangeDate.includes(filterText)
+      customer.toLowerCase().indexOf(filterText) > -1 ||
+      vehiclePlate.toLowerCase().indexOf(filterText) > -1 ||
+      vehicleModel.toLowerCase().indexOf(filterText) > -1 ||
+      vehicleKm.toLowerCase().indexOf(filterText) > -1 ||
+      changeDate.toLowerCase().indexOf(filterText) > -1
     ) {
       row.style.display = "";
     } else {
@@ -125,8 +133,11 @@ function filterRecords() {
   });
 }
 
-function deleteRecord(recordId) {
-  const isConfirmed = confirm("Bu işlemi silmek istediğinizden emin misiniz?");
+async function deleteRecord(recordId) {
+  const isConfirmed = await ipcRenderer.invoke(
+    "dialog",
+    "Bu işlemi silmek istediğinizden emin misiniz?"
+  );
 
   if (isConfirmed) {
     ipcRenderer.invoke(
@@ -141,8 +152,6 @@ async function editRecord(recordId) {
     .invoke("db-query", `SELECT * FROM vehicles WHERE id = ${recordId}`)
     .then((rows) => rows[0]);
 
-  // console.log(record);
-  // console.log(JSON.parse(record.operation))
   const operations = JSON.parse(record.operation);
   const tableBody = document.querySelector("#records-excel table tbody");
   const editForm = document.getElementById("editForm");
@@ -161,6 +170,9 @@ async function editRecord(recordId) {
   const vehicleKm = document.querySelector('#editForm input[name="vehicleKm"]');
   const vehicleContact = document.querySelector(
     '#editForm input[name="vehicleContact"]'
+  );
+  const note = document.querySelector(
+    '#editForm textarea[id="floatingTextarea3"]'
   );
   for (const i of operations) {
     const newRow = document.createElement("tr");
@@ -181,9 +193,11 @@ async function editRecord(recordId) {
   vehicleModel.value = record.vehicleModel;
   vehicleKm.value = record.vehicleKm;
   vehicleContact.value = record.vehicleContact;
+  note.value = record.note;
 
-  document.getElementById("editSaveButton").onclick = () => {
-    const isConfirmed = confirm(
+  document.getElementById("editSaveButton").onclick = async () => {
+    const isConfirmed = await ipcRenderer.invoke(
+      "dialog",
       "Bu işlemi kaydetmek istediğinizden emin misiniz?"
     );
     if (!isConfirmed) {
@@ -207,6 +221,10 @@ async function editRecord(recordId) {
     const vehicleContact = document.querySelector(
       '#editForm input[name="vehicleContact"]'
     ).value;
+    const note = document
+      .querySelector('#editForm textarea[id="floatingTextarea3"]')
+      .value.toString();
+
     const rows = tableBody.querySelectorAll("tr");
     const records = [];
     rows.forEach((row) => {
@@ -242,7 +260,7 @@ async function editRecord(recordId) {
 
     ipcRenderer.invoke(
       "db-query",
-      `UPDATE vehicles SET customer = '${customer}', vehiclePlate = '${vehiclePlate}', changeDate = '${changeDate}', vehicleModel = '${vehicleModel}', vehicleKm = '${vehicleKm}', vehicleContact = '${vehicleContact}', operation = '${recordsJSON}' WHERE id = ${recordId}`
+      `UPDATE vehicles SET customer = '${customer}', vehiclePlate = '${vehiclePlate}', changeDate = '${changeDate}', vehicleModel = '${vehicleModel}', vehicleKm = '${vehicleKm}', vehicleContact = '${vehicleContact}', note = '${note}', operation = '${recordsJSON}' WHERE id = ${recordId}`
     );
     editForm.style.display = "none";
     // remove all rows from table
@@ -334,4 +352,32 @@ function calculateTotals() {
     totalCostWithKDV.toFixed(2);
   document.getElementById("totalCostWithoutKDV").textContent =
     totalCostWithoutKDV.toFixed(2);
+}
+
+function alertSuccess(message) {
+  Toastify.toast({
+    text: message,
+    duration: 3000,
+    close: false,
+    gravity: "top",
+    style: {
+      background: "green",
+      color: "white",
+      textAlign: "center",
+    },
+  });
+}
+
+function alertError(message) {
+  Toastify.toast({
+    text: message,
+    duration: 3000,
+    close: false,
+    gravity: "top",
+    style: {
+      background: "red",
+      color: "white",
+      textAlign: "center",
+    },
+  });
 }

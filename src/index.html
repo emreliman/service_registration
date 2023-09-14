@@ -7,15 +7,20 @@
     <link rel="stylesheet" href="styles.css">
     <!-- <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
     <!-- add Bootstrap from nodemodules-->
-    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../node_modules/bootstrap/dist/css/bootstrap.min.css">
     <script src="renderer.js"></script>
   </head>
   <body>
       <h3>
         Servis Formu
       </h3>
+      <div class="d-flex justify-content-between  ">
+        <button type="button" class="btn btn-secondary m-4 p-2  " onclick="openRecords()">İşlemler</button>
+        <!-- Genel Özet butonu -->
+        <button type="button" class="btn btn-warning m-4 p-2 " onclick="openSummary()">Genel Özet</button>
+      </div>
       <!-- işlemler butonu  -->
-      <button type="button" class="btn btn-secondary ml-4  " onclick="openRecords()">İşlemler</button>
+      
     <div class="container mt-3">
       <form>
         <div class="form-group">
@@ -42,6 +47,10 @@
           <label for="oilChangeDate">Tarih</label>
           <input type="date" class="form-control" id="changeDate" name="oilChangeDate">
         </div>
+        <div class="form-floating mt-3 mb-3">
+          <textarea class="form-control" placeholder="Not Yazın" id="floatingTextarea2" style="height: 100px"></textarea>
+          <label for="floatingTextarea2">Notlar</label>
+        </div>
         <!-- <div class="form-group">
           <label for="oilChangeMileage">Last Oil Change Mileage:</label>
           <input type="number" class="form-control" id="oilChangeMileage" name="oilChangeMileage">
@@ -56,10 +65,10 @@
           </select>
         </div> -->
         <div class="summary">
-          <h4 class="text-danger">KDV <b><u>Dahil</u></b> Toplam Tutar: <span id="totalCost">0</span></h4>
-          <h4 class="text-danger">KDV <b><u>Hariç</u></b> Toplam Tutar: <span id="totalCostWithoutKDV">0</span></h4>
-          <h4  class="text-primary">Toplam İşçilik Tutarı: <span id="totalLaborCost">0</span></h4>
-          <h4  class="text-success">Toplam Yedek Parça Tutarı: <span id="totalEquipmentCost">0</span></h4>
+          <h4 class="text-danger">KDV <b><u>Dahil</u></b> Toplam Tutar: <span id="totalCost">0</span>₺</h4>
+          <h4 class="text-danger">KDV <b><u>Hariç</u></b> Toplam Tutar: <span id="totalCostWithoutKDV">0</span>₺</h4>
+          <h4  class="text-primary">Toplam İşçilik Tutarı: <span id="totalLaborCost">0</span>₺</h4>
+          <h4  class="text-success">Toplam Yedek Parça Tutarı: <span id="totalEquipmentCost">0</span>₺</h4>
         </div>
         <div class="excel-like">
           <table>
@@ -74,7 +83,7 @@
               </tr>
             </thead>
             <tbody>
-              <tr>
+              <tr id="tbody-tr">
                 <td><input type="text" placeholder="Referans No"></td>
                 <td><input type="text" placeholder="Yedek Parça"></td>
                 <td><input type="number" placeholder="Tutar" oninput="calculateTotals()" onfocus="calculateTotals()"></td>
